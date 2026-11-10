@@ -1,10 +1,57 @@
-﻿
+﻿@page "/messages"
 
-Non-routable component som skal åbne på siden.
+<PageTitle>Beskeder</PageTitle>
+
+<div class="container mt-4"/>
+
+    <h2 class="mb-4">Beskeder</h2>
+
+    <div class="row border rounded shadow-sm"
+         style="min-height: 500px;">
+
+        <div class="col-md-4 border-end p-3">
+
+            <h5>Mine samtaler</h5>
+
+            <input class="form-control mt-3" type="text" placeholder="Søg efter bruger..." />
+
+            <hr />
+
+            <p class="text-muted text-center mt-5">Du har ingen samtaler endnu.</p>
+
+        </div>
+
+        <div class="col-md-8 p-3 d-flex flex-column">
+
+            <h5>Ny besked</h5>
+            <hr />
+
+            <div class="flex-grow-1 d-flex
+                        justify-content-center
+                        align-items-center">
+
+                <div class="text-center text-muted">
+
+                    <h5>Start en samtale</h5>
 
 
-<h3>Message</h3>
+                </div>
+
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+
+                <input class="form-control" type="text" placeholder="Skriv en besked.." disabled />
+
+                <button class="btn btn-secondary" disabled>Send</button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 @code {
 
 }
+
