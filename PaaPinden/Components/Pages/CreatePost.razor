@@ -1,9 +1,34 @@
 ﻿
+<div class="card mt-3">
+    <div class="card-body">
+        <h4 class="card-title">Opret opslag</h4>
 
-Non Routable Component til når man skal lave et post. Skal have en form til at lave et post, og en knap til at submitte det.
+        <form method="get" action="@SubmitUrl">
+            <div class="mb-3">
+                <label for="post-title" class="form-label">Titel</label>
+                <input id="post-title" name="title" class="form-control" required />
+            </div>
 
-<h3>CreatePost</h3>
+            <div class="mb-3">
+                <label for="post-author" class="form-label">Forfatter</label>
+                <input id="post-author" name="author" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="post-content" class="form-label">Indhold</label>
+                <textarea id="post-content" name="content" class="form-control" rows="4" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Gem opslag</button>
+            <a class="btn btn-outline-secondary ms-2" href="@CancelUrl">Annuller</a>
+        </form>
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public string SubmitUrl { get; set; } = "/";
 
+    [Parameter]
+    public string CancelUrl { get; set; } = "/";
 }
