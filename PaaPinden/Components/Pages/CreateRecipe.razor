@@ -1,10 +1,42 @@
-﻿
+﻿<div class="card mt-3">
+    <div class="card-body">
+        <h4 class="card-title">Opret opskrift</h4>
 
-Non routable component som skal bruges til at lave en opskrift.
-Skal have en form til at lave en opskrift, og en knap til at submitte det.
+        <form method="get" action="@SubmitUrl">
+            <div class="mb-3">
+                <label for="recipe-title" class="form-label">Titel</label>
+                <input id="recipe-title" name="title" class="form-control" required />
+            </div>
 
-<h3>CreateRecipe</h3>
+            <div class="mb-3">
+                <label for="recipe-author" class="form-label">Forfatter</label>
+                <input id="recipe-author" name="author" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="recipe-difficulty" class="form-label">Sværhedsgrad</label>
+                <select id="recipe-difficulty" name="difficulty" class="form-select">
+                    <option value="Nem">Nem</option>
+                    <option value="Mellem">Mellem</option>
+                    <option value="Svær">Svær</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="recipe-content" class="form-label">Beskrivelse</label>
+                <textarea id="recipe-content" name="content" class="form-control" rows="5" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Gem opskrift</button>
+            <a class="btn btn-outline-secondary ms-2" href="@CancelUrl">Annuller</a>
+        </form>
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public string SubmitUrl { get; set; } = "/recipe";
 
+    [Parameter]
+    public string CancelUrl { get; set; } = "/recipe";
 }
