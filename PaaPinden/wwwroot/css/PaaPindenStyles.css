@@ -11,15 +11,15 @@
 
 
 
-/* Navbar header "På Pinden" */
+    /* Navbar header "På Pinden" */
     .page > .sidebar .PPsidebar {
         background-color: rgb(243, 213, 213);
     }
 
-/* Navigation links area */
-.page > .sidebar .nav-scrollable {
-    background-color: white;
-}
+    /* Navigation links area */
+    .page > .sidebar .nav-scrollable {
+        background-color: white;
+    }
 
 
 .sidebar .nav-item {
@@ -31,7 +31,7 @@
         padding-top: 1rem;
     }
 
-    .sidebar .nav-item:last-of-type {   
+    .sidebar .nav-item:last-of-type {
         padding-bottom: 1rem;
     }
 
@@ -61,7 +61,7 @@
         color: rgb(234, 89, 89);
     }
 
-    /* Sidebar Ikoner */
+/* Sidebar Ikoner */
 
 .bi {
     display: inline-block;
@@ -113,5 +113,32 @@
 
 html,
 body {
+    background-color: #f5f1eb;
+}
+
+/* Header */
+
+/* Profilbillede i header */
+.profile-picture {
+    width: 95px;
+    height: 100px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-row {
+    min-height: 100px;
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: sticky;
+    top: 0;
+    z-index: 1;
     background-color: #f5f1eb;
 }
