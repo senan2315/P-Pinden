@@ -1,5 +1,5 @@
 ﻿@page "/recipe"
-@using RecipeModel = PaaPinden.Models.Recipe
+@inject IRecipeRepository RecipeRepository //dependency injection af RecipeRepository
 
 <PageTitle>Opskrifter | På Pinden</PageTitle>
 
