@@ -19,6 +19,7 @@ namespace PaaPinden
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+            builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
             builder.Services.AddAuthentication(options =>
                 {
