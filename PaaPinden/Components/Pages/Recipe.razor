@@ -1,317 +1,187 @@
 ﻿@page "/recipe"
-@using RecipeModel = PaaPinden.Models.Recipe
+@inject IRecipeRepository RecipeRepository
 
 <PageTitle>Opskrifter | På Pinden</PageTitle>
 
-<div class="container mt-4">
-
-    <!-- Overskrift og opret-knap -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">Opskrifter</h2>
-            <p class="text-muted mb-0">
-                Find inspiration til dit næste strikkeprojekt
-            </p>
+<main class="recipes-page">
+    <header class="recipes-hero">
+        <div class="recipes-hero__text">
+            <span class="recipes-eyebrow">PÅ PINDEN / OPSKRIFTER</span>
+            <h1>Find dit næste <span>strikkeprojekt.</span></h1>
+            <p>Gå på opdagelse i opskrifter, del dine idéer, og find inspiration til det næste, du vil strikke.</p>
         </div>
 
-        <a class="btn btn-primary"
-               href="/recipe?createRecipe=true">
-            + Opret opskrift
-        </a>
-    </div>
+        @if (!ShowCreateRecipe)
+        {
+            <a class="recipes-primary-link" href="/recipe?createRecipe=true">
+                <span aria-hidden="true">+</span>
+                Opret opskrift
+            </a>
+        }
+    </header>
 
     @if (ShowCreateRecipe)
     {
-        <!-- Non-routeable komponent -->
-        <div class="mb-4">
-            <CreateRecipe SubmitUrl="/recipe"
-                          CancelUrl="/recipe" />
-        </div>
+        <section class="recipes-create-panel" aria-labelledby="create-heading">
+            <div class="recipes-section-heading">
+                <div>
+                    <span class="recipes-eyebrow">DEL DIN KREATIVITET</span>
+                    <h2 id="create-heading">Opret en opskrift</h2>
+                </div>
+                <a class="recipes-back-link" href="/recipe">Tilbage til opskrifter</a>
+            </div>
+
+            <CreateRecipe SubmitUrl="/recipe" CancelUrl="/recipe" />
+        </section>
     }
     else
     {
-        <!-- Søgning og sortering -->
-        <form method="get" action="/recipe"
-              class="row g-3 mb-4">
+        var visibleRecipes = GetVisibleRecipes();
 
-            <div class="col-md-8">
-                <label for="search" class="form-label">
-                    Søg efter opskrifter
-                </label>
-
-                <input id="search"
-                       name="search"
-                       value="@Search"
-                       class="form-control"
-                       placeholder="Søg i titel, indhold eller forfatter..." />
-            </div>
-
-            <div class="col-md-3">
-                <label for="sort" class="form-label">
-                    Sorter efter
-                </label>
-
-                <select id="sort"
-                        name="sort"
-                        class="form-select">
-
-                    <option value="ny" selected="@SortIsNy">
-                        Nyeste
-                    </option>
-
-                    <option value="populaert" selected="@SortIsPopulaer">
-                        Populært
-                    </option>
-
-                    <option value="aeldst" selected="@SortIsAeldst">
-                        Ældste
-                    </option>
-
-                </select>
-            </div>
-
-            <div class="col-md-1 d-flex align-items-end">
-                <button type="submit"
-                        class="btn btn-outline-primary w-100">
-                    Søg
-                </button>
-            </div>
-
-        </form>
-
-        <!-- Opskriftsfeed -->
-        <h4 class="mb-3">Udforsk opskrifter</h4>
-
-        @if (!VisibleRecipes.Any())
-        {
-            <div class="text-center py-5">
-                <h5>Ingen opskrifter fundet</h5>
-                <p class="text-muted">
-                    Der er endnu ingen opskrifter,
-                    som matcher din søgning.
-                </p>
-            </div>
-        }
-        else
-        {
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-
-                @foreach (var recipe in VisibleRecipes)
-                {
-                    <div class="col">
-
-                        <article class="recipe-card">
-
-                            <!-- Billedeområde -->
-                            <div class="recipe-image">
-                                <span>På Pinden</span>
-                            </div>
-
-                            <!-- Information -->
-                            <div class="recipe-info">
-
-                                <h5 class="recipe-title">
-                                    @recipe.Title
-                                </h5>
-
-                                <p class="recipe-author">
-                                    Af @recipe.Author
-                                </p>
-
-                                <p class="recipe-description">
-                                    @recipe.Content
-                                </p>
-
-                                <div class="recipe-footer">
-
-                                    <span class="recipe-difficulty">
-                                        @recipe.Difficulty
-                                    </span>
-
-                                    <span class="recipe-likes">
-                                        ♥ @recipe.Likes
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                        </article>
-
+        <section aria-label="Find opskrifter">
+            <form class="recipes-filters" method="get" action="/recipe">
+                <div class="recipes-field recipes-field--search">
+                    <label for="recipe-search">Søg efter opskrifter</label>
+                    <div class="recipes-search-input">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <path d="m16 16 4.5 4.5"></path>
+                        </svg>
+                        <input id="recipe-search"
+                               name="search"
+                               type="search"
+                               value="@Search"
+                               placeholder="Søg i titel, beskrivelse eller forfatter" />
                     </div>
-                }
+                </div>
 
+                <div class="recipes-field recipes-field--sort">
+                    <label for="recipe-sort">Sorter efter</label>
+                    <select id="recipe-sort" name="sort">
+                        <option value="ny" selected="@SortIsNy">Nyeste først</option>
+                        <option value="populaert" selected="@SortIsPopulaer">Mest populære</option>
+                        <option value="aeldst" selected="@SortIsAeldst">Ældste først</option>
+                    </select>
+                </div>
+
+                <button class="recipes-search-button" type="submit">Søg</button>
+            </form>
+        </section>
+
+        <section class="recipes-gallery" aria-labelledby="gallery-heading">
+            <div class="recipes-section-heading recipes-section-heading--gallery">
+                <div>
+                    <span class="recipes-eyebrow">FRA FÆLLESSKABET</span>
+                    <h2 id="gallery-heading">Udforsk opskrifter</h2>
+                </div>
+                <div class="recipes-results" role="status">
+                    @visibleRecipes.Count @(visibleRecipes.Count == 1 ? "opskrift" : "opskrifter")
+                </div>
             </div>
-        }
+
+            @if (visibleRecipes.Count == 0)
+            {
+                <div class="recipes-empty">
+                    <div class="recipes-empty__symbol" aria-hidden="true">✳</div>
+                    <h3>@(string.IsNullOrWhiteSpace(Search) ? "Der er ingen opskrifter endnu" : "Vi fandt ingen opskrifter")</h3>
+                    <p>
+                        @(string.IsNullOrWhiteSpace(Search)
+                            ? "Vær den første til at dele en strikkeopskrift med fællesskabet."
+                            : "Prøv et andet søgeord, eller ryd filtrene for at se alle opskrifter.")
+                    </p>
+                    @if (!string.IsNullOrWhiteSpace(Search))
+                    {
+                        <a class="recipes-secondary-link" href="/recipe">Ryd søgning</a>
+                    }
+                    else
+                    {
+                        <a class="recipes-secondary-link" href="/recipe?createRecipe=true">Opret første opskrift</a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="recipes-grid">
+                    @foreach (var recipe in visibleRecipes)
+                    {
+                        <article class="recipe-card">
+                            <div class="recipe-card__cover">
+                                <span class="recipe-card__cover-tag">STRIKKEOPSKRIFT</span>
+                                <svg class="recipe-card__illustration" viewBox="0 0 160 160" fill="none"
+                                     stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                                     stroke-linejoin="round" aria-hidden="true">
+                                    <circle cx="80" cy="91" r="39"></circle>
+                                    <path d="M50 66c22-5 47 8 66 31M43 90c28-9 57 1 73 18M54 118c4-29 19-52 43-62M78 128c-2-26 8-50 28-67"></path>
+                                    <path d="M112 116c14 5 18 17 29 20"></path>
+                                    <path d="M51 16l42 51M87 13 66 78"></path>
+                                    <path d="M46 10l9 11M82 9l10 7"></path>
+                                </svg>
+                            </div>
+
+                            <div class="recipe-card__body">
+                                <p class="recipe-card__author">Af @recipe.Author</p>
+                                <h3 class="recipe-card__title">@recipe.Title</h3>
+                                <p class="recipe-card__description">@recipe.Content</p>
+
+                                <div class="recipe-card__footer">
+                                    <span class="recipe-card__difficulty">@recipe.Difficulty</span>
+                                    <span class="recipe-card__likes" aria-label="Antal likes">
+                                        <span aria-hidden="true">♥</span> @recipe.Likes
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
     }
-
-</div>
-
-<style>
-    /* Firkantede Pinterest-inspirerede kort */
-    .recipe-card {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        background-color: white;
-        border: 1px solid #e5e5e5;
-        border-radius: 14px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-        .recipe-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        }
-
-    /* Billede */
-    .recipe-image {
-        height: 55%;
-        flex-shrink: 0;
-        background: linear-gradient( 135deg, #e8d9c5, #c5a98c );
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #5d4636;
-        font-size: 18px;
-        font-weight: 600;
-    }
-
-    /* Kortets information */
-    .recipe-info {
-        padding: 12px;
-        flex: 1;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .recipe-title {
-        font-size: 15px;
-        font-weight: 600;
-        margin-bottom: 4px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .recipe-author {
-        font-size: 12px;
-        color: #888;
-        margin-bottom: 6px;
-    }
-
-    .recipe-description {
-        font-size: 12px;
-        color: #555;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
-
-    /* Likes og sværhedsgrad */
-    .recipe-footer {
-        margin-top: auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 5px;
-        font-size: 12px;
-    }
-
-    .recipe-difficulty {
-        background-color: #f1ece6;
-        color: #715944;
-        padding: 4px 8px;
-        border-radius: 20px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .recipe-likes {
-        color: #d9536f;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-</style>
+</main>
 
 @code {
-
-    // Query parameters
-
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "createRecipe")]
+    // Værdier læses fra URL'en, så søgning og sortering også virker med SSR.
+    [Parameter, SupplyParameterFromQuery(Name = "createRecipe")]
     public bool ShowCreateRecipe { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "search")]
+    [Parameter, SupplyParameterFromQuery(Name = "search")]
     public string? Search { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "sort")]
+    [Parameter, SupplyParameterFromQuery(Name = "sort")]
     public string? Sort { get; set; }
 
-
-    // Opskrifter - tilslut repository senere
     private List<RecipeModel> Recipes = new();
 
-
-    // Sorteringsvalg
-    private bool SortIsNy =>
-        string.IsNullOrEmpty(Sort) || Sort == "ny";
-
-    private bool SortIsPopulaer =>
-        Sort == "populaert";
-
-    private bool SortIsAeldst =>
-        Sort == "aeldst";
-
-
-    // Filtrering og sortering
-    private IEnumerable<RecipeModel> VisibleRecipes
+    protected override async Task OnInitializedAsync()
     {
-        get
+        Recipes = await RecipeRepository.GetAllRecipesAsync();
+    }
+
+    private bool SortIsNy => Sort != "populaert" && Sort != "aeldst";
+    private bool SortIsPopulaer => Sort == "populaert";
+    private bool SortIsAeldst => Sort == "aeldst";
+
+    private List<RecipeModel> GetVisibleRecipes()
+    {
+        IEnumerable<RecipeModel> result = Recipes;
+
+        if (!string.IsNullOrWhiteSpace(Search))
         {
-            IEnumerable<RecipeModel> result = Recipes;
+            string searchTerm = Search.Trim();
 
-            // Søgning
-            if (!string.IsNullOrWhiteSpace(Search))
-            {
-                string searchTerm = Search.Trim();
-
-                result = result.Where(recipe =>
-                    (recipe.Title?.Contains(
-                        searchTerm,
-                        StringComparison.OrdinalIgnoreCase) ?? false)
-                    ||
-                    (recipe.Content?.Contains(
-                        searchTerm,
-                        StringComparison.OrdinalIgnoreCase) ?? false)
-                    ||
-                    (recipe.Author?.ToString()?.Contains(
-                        searchTerm,
-                        StringComparison.OrdinalIgnoreCase) ?? false)
-                );
-            }
-
-            // Sortering
-            result = Sort switch
-            {
-                "populaert" => result.OrderByDescending(
-                    recipe => recipe.Likes),
-
-                "aeldst" => result.OrderBy(
-                    recipe => recipe.CreatedAt),
-
-                _ => result.OrderByDescending(
-                    recipe => recipe.CreatedAt)
-            };
-
-            return result;
+            result = result.Where(recipe =>
+                (recipe.Title?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (recipe.Content?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (recipe.Author?.ToString()?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false));
         }
+
+        result = Sort switch
+        {
+            "populaert" => result.OrderByDescending(recipe => recipe.Likes),
+            "aeldst" => result.OrderBy(recipe => recipe.CreatedAt),
+            _ => result.OrderByDescending(recipe => recipe.CreatedAt)
+        };
+
+        return result.ToList();
     }
 }
