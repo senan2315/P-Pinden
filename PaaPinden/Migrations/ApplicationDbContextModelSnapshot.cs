@@ -411,7 +411,6 @@ namespace PaaPinden.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PostID"));
 
                     b.Property<string>("ApplicationUserID")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Author")
@@ -426,7 +425,6 @@ namespace PaaPinden.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<byte[]>("Image")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Title")
@@ -434,14 +432,23 @@ namespace PaaPinden.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("Video")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.HasKey("PostID");
 
                     b.HasIndex("ApplicationUserID");
 
-                    b.ToTable("Post");
+                    b.ToTable("_posts");
+
+                    b.HasData(
+                        new
+                        {
+                            PostID = 1,
+                            Author = "Admin",
+                            Content = "Dette er den første post på PaaPinden. Vi håber, du vil nyde at dele dine strikkeoplevelser her!",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Velkommen til PaaPinden!"
+                        });
                 });
 
             modelBuilder.Entity("PaaPinden.Models.Recipe", b =>
@@ -711,9 +718,7 @@ namespace PaaPinden.Migrations
                 {
                     b.HasOne("PaaPinden.Data.ApplicationUser", "ApplicationUser")
                         .WithMany("Posts")
-                        .HasForeignKey("ApplicationUserID")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("ApplicationUserID");
 
                     b.Navigation("ApplicationUser");
                 });

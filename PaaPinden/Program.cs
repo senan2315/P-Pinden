@@ -9,7 +9,7 @@ namespace PaaPinden
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +19,7 @@ namespace PaaPinden
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+            builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
             builder.Services.AddAuthentication(options =>
@@ -30,7 +31,7 @@ namespace PaaPinden
             builder.Services.AddAuthorization();
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -47,6 +48,12 @@ namespace PaaPinden
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
             var app = builder.Build();
+
+            if (app.Environment.IsDevelopment())
+            {
+                await using var scope = app.Services.CreateAsyncScope();
+                await AdminAccountSeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

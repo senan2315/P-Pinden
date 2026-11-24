@@ -1,22 +1,31 @@
-﻿
+﻿@page "/createpost"
+@rendermode InteractiveServer
+@inject IPostRepository PostRepository
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 <div class="card mt-3">
     <div class="card-body">
         <h4 class="card-title">Opret opslag</h4>
 
-        <form method="get" action="@SubmitUrl">
+        @if (!string.IsNullOrWhiteSpace(SuccessMessage))
+        {
+            <div class="alert alert-success" role="status">@SuccessMessage</div>
+        }
+
+        <form @onsubmit="HandleSubmitAsync">
             <div class="mb-3">
                 <label for="post-title" class="form-label">Titel</label>
-                <input id="post-title" name="title" class="form-control" required />
+                <input id="post-title" name="title" class="form-control" @bind="Title" required />
             </div>
 
             <div class="mb-3">
                 <label for="post-author" class="form-label">Forfatter</label>
-                <input id="post-author" name="author" class="form-control" required />
+                <input id="post-author" name="author" class="form-control" @bind="Author" required />
             </div>
 
             <div class="mb-3">
                 <label for="post-content" class="form-label">Indhold</label>
-                <textarea id="post-content" name="content" class="form-control" rows="4" required></textarea>
+                <textarea id="post-content" name="content" class="form-control" rows="4" @bind="Content" required></textarea>
             </div>
 
             <button type="submit" class="btn btn-primary">Gem opslag</button>
@@ -26,9 +35,34 @@
 </div>
 
 @code {
+    private string Title { get; set; } = string.Empty;
+    private string Author { get; set; } = string.Empty;
+    private string Content { get; set; } = string.Empty;
+    private string? SuccessMessage { get; set; }
+
     [Parameter]
     public string SubmitUrl { get; set; } = "/";
 
     [Parameter]
     public string CancelUrl { get; set; } = "/";
+
+    private async Task HandleSubmitAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        var post = new Post
+        {
+            Title = Title.Trim(),
+            Author = Author.Trim(),
+            Content = Content.Trim(),
+            CreatedAt = DateTime.UtcNow,
+            ApplicationUserID = userId,
+            Image = [],
+            Video = []
+        };
+
+        await PostRepository.AddPostAsync(post);
+        SuccessMessage = "Opslaget er gemt.";
+    }
 }
