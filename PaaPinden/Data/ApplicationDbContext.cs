@@ -7,7 +7,7 @@ namespace PaaPinden.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<Post> Post { get; set; }
+        public DbSet<Post> _posts { get; set; }
         public DbSet<Comment> Comment { get; set; }
         public DbSet<Message> Message { get; set; }
         public DbSet<Recipe> Recipe { get; set; }
@@ -80,12 +80,12 @@ namespace PaaPinden.Data
                 .HasForeignKey(c => c.PostID)
                 .OnDelete(DeleteBehavior.NoAction); 
 
-            modelBuilder.Entity<Post>()
+                modelBuilder.Entity<Post>()
                 .HasOne(p => p.ApplicationUser)
                 .WithMany(u => u.Posts)
                 .HasForeignKey(p => p.ApplicationUserID)
                 .OnDelete(DeleteBehavior.NoAction);
-
+          
             modelBuilder.Entity<Recipe>()
                .HasMany(r => r.Comments) 
                .WithOne(c => c.Recipe) 
@@ -145,6 +145,16 @@ namespace PaaPinden.Data
                 .WithMany(u => u.Followers)
                 .HasForeignKey(f => f.FollowingID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Post>().HasData(
+                new Post
+                {
+                    Author = "Admin",
+                    PostID = 1,
+                    Title = "Velkommen til PaaPinden!",
+                    Content = "Dette er den første post på PaaPinden. Vi håber, du vil nyde at dele dine strikkeoplevelser her!",
+                }
+            );
         }
 
     }
